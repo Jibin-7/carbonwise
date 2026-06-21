@@ -15,9 +15,12 @@ import tempfile
 import json
 import csv
 import io
+from app import app
 
 # Import the main application and core logic functions
 import app as carbon_app
+
+app.config["RATELIMIT_ENABLED"] = False
 
 @pytest.fixture
 def client():

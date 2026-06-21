@@ -34,7 +34,7 @@ app = Flask(__name__)
 # --- Security: HTTP Headers & CORS ---
 # Applies Content Security Policy (CSP) and prevents Clickjacking (X-Frame-Options)
 Talisman(app, content_security_policy=None, force_https=False) 
-CORS(app, resources={r"/api/*": {"origins": "*"}}) 
+CORS(app, resources={r"/api/*": {"origins": ["https://carbonwise-ruby.vercel.app", "http://localhost:3000"]}})
 
 # --- Security: API Rate Limiting ---
 # Prevents DDoS attacks and brute-force endpoint polling
@@ -60,6 +60,17 @@ DIET_BASE_CO2 = {
     'meat': 105.0
 }
 NATIONAL_AVERAGE_MONTHLY = 1100.0 # Standard benchmark in kg
+
+# --- Code Quality: Global Error Handling ---
+@app.errorhandler(Exception)
+def handle_exception(e):
+    """Ensure all unhandled exceptions return a clean JSON response."""
+    logger.error(f"Unhandled Server Exception: {str(e)}")
+    return jsonify({
+        "status": "error",
+        "description": "An internal server error occurred.",
+        "details": str(e) if app.debug else "Check server logs."
+    }), 500 
 
 # --- Database Management (Efficiency & Security) ---
 
