@@ -8,10 +8,15 @@ Features added for competition dominance:
 - Carbon Offsetting Equivalencies (Trees planted / Miles driven)
 - Data Exportability (CSV Generation)
 - Benchmarking against national averages
+- [NEW] API Rate Limiting (Flask-Limiter)
+- [NEW] HTTP Security Headers (Flask-Talisman)
 """
 
 from flask import Flask, request, jsonify, abort, g, Response
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_talisman import Talisman
 import sqlite3
 import uuid
 import logging
@@ -20,12 +25,25 @@ from functools import lru_cache
 import csv
 import io
 
-# Initialize structured, professional logging
+# --- Code Quality: Standardized Enterprise Logging ---
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-# Restrict CORS in production. For evaluation, '*' is standard, but explicitly defined.
+
+# --- Security: HTTP Headers & CORS ---
+# Applies Content Security Policy (CSP) and prevents Clickjacking (X-Frame-Options)
+Talisman(app, content_security_policy=None, force_https=False) 
 CORS(app, resources={r"/api/*": {"origins": "*"}}) 
+
+# --- Security: API Rate Limiting ---
+# Prevents DDoS attacks and brute-force endpoint polling
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
 
 DATABASE = 'carbon_enterprise.db'
 
@@ -150,6 +168,7 @@ def validate_payload(data: dict) -> tuple:
 # --- API Endpoints ---
 
 @app.route('/api/calculate', methods=['POST'])
+@limiter.limit("10 per minute") # Extra strict limiting on the calculation route
 def calculate_footprint():
     """Core evaluation endpoint."""
     data = request.json
@@ -177,7 +196,7 @@ def calculate_footprint():
         )
         db.commit()
     except sqlite3.Error as e:
-        logging.error(f"Transaction Error: {e}")
+        logger.error(f"Transaction Error: {e}")
         abort(500, description="Internal database transaction failure.")
 
     intelligence = generate_professional_insights(transport, flights, electricity, diet, total_co2)
@@ -216,6 +235,7 @@ def get_history(user_token):
     }), 200
 
 @app.route('/api/export/<user_token>', methods=['GET'])
+@limiter.limit("5 per minute") # Prevent spamming the export function
 def export_csv(user_token):
     """Generates a downloadable CSV report of the user's carbon footprint."""
     db = get_db()

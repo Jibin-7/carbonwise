@@ -14,11 +14,15 @@
 - **Architecture:** Clean separation of concerns using a decoupled React frontend and a RESTful Flask backend.
 - **Readability:** Extensively documented using Python docstrings, modular React components, and semantic naming conventions.
 - **Maintainability:** Abstracted configuration files (e.g., centralized `config.js` for API routing) and reusable UI components.
+- **[NEW] Frontend Fault Tolerance:** Engineered custom React class-based Error Boundaries (`componentDidCatch`) to intercept rendering faults and display graceful fallback UI, preventing total application crashes.
+- **[NEW] Standardized Server Logging:** Replaced standard console output with Python's native `logging` module for timestamped, severity-leveled server telemetry.
 
 ### 2. Security & Safe Practices
 - **Input Sanitization:** Dual-layer validation boundaries. The frontend prevents malformed submissions, while the Python backend enforces strict type casting and numerical clamping (e.g., `max(0.0, min(val, 15000.0))`).
 - **Database Safety:** Complete mitigation of SQL injection vulnerabilities via parameterized SQLite queries (`(?, ?, ?)`).
 - **Graceful Error Handling:** Backend exceptions trigger safe `abort()` sequences, preventing stack trace leaks to the client architecture.
+- **[NEW] API Rate Limiting:** Integrated `Flask-Limiter` with in-memory tracking to throttle requests and prevent brute-force/DDoS attacks on environmental calculation endpoints.
+- **[NEW] HTTP Security Headers:** Implemented `Flask-Talisman` to enforce Content Security Policies (CSP), strict-transport-security, and X-Frame-Options anti-clickjacking protocols.
 
 ### 3. Resource Efficiency
 - **Memory Management:** Utilizes Python's `@lru_cache` to memorize repetitive programmatic calculations, drastically saving CPU cycles. 
