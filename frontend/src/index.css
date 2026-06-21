@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@layer base {
+  body {
+    /* Premium off-white background (slate-50) is softer on the eyes than pure white */
+    @apply bg-[#F8FAFC] text-slate-800 antialiased overflow-x-hidden;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    
+    /* Sub-pixel antialiasing makes text look incredibly crisp (Apple-like rendering) */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Customizes the highlight color when a user drags their mouse over text */
+  ::selection {
+    @apply bg-emerald-200 text-emerald-900;
+  }
+}
+
+@layer utilities {
+  /* The sophisticated, mathematical curve used by Apple and premium SaaS 
+    for smooth UI element reveals. 
+  */
+  .animate-fade-in-up {
+    animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Optional utility for ultra-premium glassmorphism cards */
+  .glass-panel {
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)];
+  }
+}
+
+/* --- Enterprise Polish: Custom Scrollbars --- */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-full transition-colors duration-300;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400;
+}
+
+/* Ensure focus outlines for accessibility are classy, not default blue halos */
+*:focus-visible {
+  @apply outline-none ring-2 ring-emerald-500 ring-offset-2 ring-offset-[#F8FAFC];
+}
