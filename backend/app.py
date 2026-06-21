@@ -72,6 +72,15 @@ def handle_exception(e):
         "details": str(e) if app.debug else "Check server logs."
     }), 500 
 
+@app.route('/', methods=['GET'])
+def health_check():
+    """Basic health check for cloud deployment pings."""
+    return jsonify({
+        "status": "online", 
+        "service": "CarbonWise Enterprise API",
+        "version": "1.0.0"
+    }), 200
+
 # --- Database Management (Efficiency & Security) ---
 
 def get_db():
